@@ -2,7 +2,14 @@ var Quibble = require('../models/quibbleModel'),
   quibbles = require('./initDatabase'),
   mongoose = require('mongoose');
 
-var uri = "mongodb://localhost/quibbledb";
+var uri;
+
+if (process.env.ENV === 'Test') {
+  uri = "mongodb://localhost/quibbledb_test";
+}
+else {
+  uri = "mongodb://localhost/quibbledb";
+}
 
 // Set up default mongoose connection
 mongoose.connect(uri, {
