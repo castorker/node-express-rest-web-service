@@ -23,16 +23,30 @@ var quibbleController = function (Quibble) {
 
     Quibble.find(query, function (err, quibbles) {
       if (err) {
-        //console.log(err);
+        // console.log(err);
         res.status(500).send(err);
       } else {
-        res.json(quibbles);
+        // HATEOAS - Using Hypermedia for easy API navigation
+        var returnQuibbles = [];
+        quibbles.forEach(function (element, index, array) {
+            var newQuibble = element.toJSON();
+            newQuibble.links = {};
+            newQuibble.links.self = 'http://' + req.headers.host + '/api/quibbles/' + newQuibble._id;
+            returnQuibbles.push(newQuibble);
+        });
+        res.json(returnQuibbles);
+        // res.json(quibbles);
       }
     });
   }
 
   var getById = function (req, res) {
-    res.json(req.quibble);
+    // HATEOAS - Using Hypermedia for easy API navigation
+    var returnQuibble = req.quibble.toJSON();
+    returnQuibble.links = {};
+    var newLink = 'http://' + req.headers.host + '/api/quibbles?category=' + returnQuibble.category;
+    returnQuibble.links.FilterByThisCategory = newLink.replace(' ', '%20');
+    res.json(returnQuibble);
   }
 
   var put = function(req, res) {
